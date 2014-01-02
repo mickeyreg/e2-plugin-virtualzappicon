@@ -37,6 +37,7 @@ from Components.FileList import FileList
 from enigma import eServiceReference,  eTimer, getDesktop, ePixmap
 from ServiceReference import ServiceReference
 from Components.SystemInfo import SystemInfo
+from Components.ParentalControl import parentalControl
 from enigma import eServiceCenter, getBestPlayableServiceReference
 from Components.VideoWindow import VideoWindow
 from enigma import ePoint, eEPGCache
@@ -63,6 +64,12 @@ from Tools.Directories import pathExists, SCOPE_SKIN_IMAGE, SCOPE_CURRENT_SKIN, 
 # for localized messages
 from . import _
 
+# PiPServiceRelation installed?
+try:
+	from Plugins.SystemPlugins.PiPServiceRelation.plugin import getRelationDict, CONFIG_FILE
+	plugin_PiPServiceRelation_installed = True
+except:
+	plugin_PiPServiceRelation_installed = False
 config.plugins.virtualzap = ConfigSubsection()
 config.plugins.virtualzap.mode = ConfigSelection(default="0", choices = [("0", _("as plugin in extended bar")),("1", _("with long OK press")), ("2", _("with exit button"))])
 config.plugins.virtualzap.usepip = ConfigYesNo(default = True)
@@ -351,7 +358,13 @@ class VirtualZap(Screen):
 		self.exitTimer.timeout.get().append(self.standardPiP)
 		# reverse changes of ChannelSelection when closing plugin
 		self.onClose.append(self.__onClose)
-
+		# if PiPServiceRelation is installed, get relation dict
+		if plugin_PiPServiceRelation_installed:
+			self.pipServiceRelation = getRelationDict()
+		else:
+			self.pipServiceRelation = {}
+		
+			
 	def onLayoutReady(self):
 		self.updateInfos()
 
@@ -469,9 +482,9 @@ class VirtualZap(Screen):
 					t = localtime(event[0][1])
 					duration = event[0][2]
 					if modus == 0:
-						timedisplay = "+%d min" % (((event[0][1] + duration) - time()) / 60)
+						timedisplay =_("+%d min") % (((event[0][1] + duration) - time()) / 60)
 					elif modus == 1:
-						timedisplay = "%d min" %  (duration / 60)
+						timedisplay =_("%d min") %  (duration / 60)
 					return "%02d:%02d  %s" % (t[3],t[4], event[0][4]), timedisplay
 				else:
 					return "", ""
@@ -590,59 +603,84 @@ class VirtualZap(Screen):
 
 	# if available play service in PiP 
 	def playService(self, service):
-		if service and (service.flags & eServiceReference.isGroup):
-			ref = getBestPlayableServiceReference(service, eServiceReference())
-		else:
-			ref = service
-		if ref and ref.toString() != self.currentPiP:
-			self.pipservice = eServiceCenter.getInstance().play(ref)
-			if self.pipservice and not self.pipservice.setTarget(1):
-				self.pipservice.start()
-				self.currentPiP = ref.toString()
+		if parentalControl.getProtectionLevel(service.toCompareString()) == -1 or (parentalControl.configInitialized and parentalControl.sessionPinCached and parentalControl.sessionPinCachedValue): # check parentalControl, only play a protected service when Pin-Cache is activated and still valid
+			current_service = service
+			n_service = self.pipServiceRelation.get(service.toString(),None) # PiPServiceRelation
+			if n_service is not None:
+				service = eServiceReference(n_service)
+			if service and (service.flags & eServiceReference.isGroup):
+				ref = getBestPlayableServiceReference(service, eServiceReference())
 			else:
-				self.pipservice = None
-				self.currentPiP = ""
-
+				ref = service
+			if ref and ref.toString() != self.currentPiP:
+				self.pipservice = eServiceCenter.getInstance().play(ref)
+				if self.pipservice and not self.pipservice.setTarget(1):
+					self.pipservice.start()
+					self.currentPiP = current_service.toString()
+				else:
+					self.pipservice = None
+					self.currentPiP = ""
+		else:
+			self.pipservice = None
+			self.currentPiP = ""
 
 	# switch with numbers
 	def keyNumberGlobal(self, number):
-		self.session.openWithCallback(self.numberEntered, NumberZap, number)
+		self.session.openWithCallback(self.numberEntered, NumberZap, number, self.searchNumber)
 
-	def numberEntered(self, retval):
-		if retval > 0:
-			self.zapToNumber(retval)
+	def numberEntered(self, service = None, bouquet = None):
+		if service:
+			self.selectAndStartService(service, bouquet)
 
 	def searchNumberHelper(self, serviceHandler, num, bouquet):
 		servicelist = serviceHandler.list(bouquet)
-		if not servicelist is None:
-			while num:
+		if servicelist:
+			serviceIterator = servicelist.getNext()
+			while serviceIterator.valid():
+				if num == serviceIterator.getChannelNum():
+					return serviceIterator
 				serviceIterator = servicelist.getNext()
-				if not serviceIterator.valid(): #check end of list
-					break
-				playable = not (serviceIterator.flags & (eServiceReference.isMarker|eServiceReference.isDirectory))
-				if playable:
-					num -= 1;
-			if not num: #found service with searched number ?
-				return serviceIterator, 0
-		return None, num
+		return None
 
-	def zapToNumber(self, number):
-		bouquet = self.servicelist.bouquet_root
+	def searchNumber(self, number, firstBouquetOnly = False):
+		bouquet = self.servicelist.getRoot()
 		service = None
 		serviceHandler = eServiceCenter.getInstance()
-		bouquetlist = serviceHandler.list(bouquet)
-		if not bouquetlist is None:
-			while number:
+		if not firstBouquetOnly:
+			service = self.searchNumberHelper(serviceHandler, number, bouquet)
+		if config.usage.multibouquet.value and not service:
+			bouquet = self.servicelist.bouquet_root
+			bouquetlist = serviceHandler.list(bouquet)
+			if bouquetlist:
 				bouquet = bouquetlist.getNext()
-				if not bouquet.valid(): #check end of list
-					break
-				if bouquet.flags & eServiceReference.isDirectory:
-					service, number = self.searchNumberHelper(serviceHandler, number, bouquet)
-		if not service is None:
-			self.setServicelistSelection(bouquet, service)
-		# update infos, no matter if service is none or not
-		self.updateInfos()
+				while bouquet.valid():
+					if bouquet.flags & eServiceReference.isDirectory:
+						service = self.searchNumberHelper(serviceHandler, number, bouquet)
+						if service:
+							playable = not (service.flags & (eServiceReference.isMarker|eServiceReference.isDirectory)) or (service.flags & eServiceReference.isNumberedMarker)
+							if not playable:
+								service = None
+							break
+						if config.usage.alternative_number_mode.value or firstBouquetOnly:
+							break
+					bouquet = bouquetlist.getNext()
+		return service, bouquet
 
+	def selectAndStartService(self, service, bouquet):
+		if service:
+			if self.servicelist.getRoot() != bouquet: #already in correct bouquet?
+				self.servicelist.clearPath()
+				if self.servicelist.bouquet_root != bouquet:
+					self.servicelist.enterPath(self.servicelist.bouquet_root)
+				self.servicelist.enterPath(bouquet)
+			self.servicelist.setCurrentSelection(service) #select the service in servicelist
+			self.servicelist.zap(enable_pipzap = True)
+		self.updateInfos()
+		
+	def zapToNumber(self, number):
+		service, bouquet = self.searchNumber(number)
+		self.selectAndStartService(service, bouquet)
+		
 	def swap(self, number):
 		# save old values for selecting it in servicelist after zapping
 		currentRef = self.curRef
@@ -681,7 +719,6 @@ class VirtualZap(Screen):
 				self.setServicelistSelection(bouquet, ref)
 		# close ChannelSelection
 		self.servicelist.revertMode = None
-		self.servicelist.asciiOff()
 		self.servicelist.close(None)
 
 		# clean up
@@ -729,7 +766,7 @@ class VirtualZap(Screen):
 				"keyRadio": self.servicelist.setModeRadio,
 				"keyTV": self.servicelist.setModeTv,
 			})
-
+			
 class DirectoryBrowserVZ(Screen):
 	skin = """<screen name="DirectoryBrowserVZ" position="center,center" size="520,440" title=" " >
 			<ePixmap pixmap="skin_default/buttons/red.png" position="0,0" size="140,40" alphatest="on" />
@@ -811,6 +848,7 @@ class VirtualZapConfig(Screen, ConfigListScreen):
 		Screen.__init__(self, session)
 		self["key_red"] = StaticText(_("Cancel"))
 		self["key_green"] = StaticText(_("OK"))
+		self.setTitle(_("Virtual Zap Config"))
 		self.list = [ ]
 		self.list.append(getConfigListEntry(_("Usage"), config.plugins.virtualzap.mode))
 		if SystemInfo.get("NumVideoDecoders", 1) > 1:
