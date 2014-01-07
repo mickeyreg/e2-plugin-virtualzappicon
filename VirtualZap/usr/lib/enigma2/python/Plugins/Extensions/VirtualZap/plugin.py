@@ -854,12 +854,12 @@ class VirtualZapConfig(Screen, ConfigListScreen):
 		self.setTitle(_("Virtual Zap Config"))
 		self.list = [ ]
 		self.list.append(getConfigListEntry(_("Usage"), config.plugins.virtualzap.mode))
+		self.list.append(getConfigListEntry(_("Show picons"), config.plugins.virtualzap.picons))
+		self.list.append(getConfigListEntry(_("Picon path"), config.plugins.virtualzap.picondir))
 		if SystemInfo.get("NumVideoDecoders", 1) > 1:
 			self.list.append(getConfigListEntry(_("Use PiP"), config.plugins.virtualzap.usepip))
 			self.list.append(getConfigListEntry(_("Show PiP in Infobar"), config.plugins.virtualzap.showpipininfobar))
 			self.list.append(getConfigListEntry(_("Start standard PiP after x secs (0 = disabled)"), config.plugins.virtualzap.exittimer))
-		self.list.append(getConfigListEntry(_("Show picons"), config.plugins.virtualzap.picons))
-		self.list.append(getConfigListEntry(_("Picon path"), config.plugins.virtualzap.picondir))
 		self.list.append(getConfigListEntry(_("Remember last service"), config.plugins.virtualzap.saveLastService))
 		ConfigListScreen.__init__(self, self.list, session)
 		self["setupActions"] = ActionMap(["SetupActions", "ColorActions"],
@@ -898,4 +898,3 @@ class VirtualZapConfig(Screen, ConfigListScreen):
 			self.session.open(TryQuitMainloop, 3)
 		else:
 			self.close()
-
