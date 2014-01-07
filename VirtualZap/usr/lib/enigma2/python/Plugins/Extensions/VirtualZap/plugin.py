@@ -837,7 +837,7 @@ class DirectoryBrowserVZ(Screen):
 class VirtualZapConfig(Screen, ConfigListScreen):
 
 	skin = """
-		<screen position="center,center" size="560,180" title="Virtual Zap Config" >
+		<screen position="center,center" size="560,400" title="Virtual Zap Config" >
 			<ePixmap pixmap="skin_default/buttons/red.png" position="0,0" zPosition="0" size="140,40" transparent="1" alphatest="on" />
 			<ePixmap pixmap="skin_default/buttons/green.png" position="140,0" zPosition="0" size="140,40" transparent="1" alphatest="on" />
 			<ePixmap pixmap="skin_default/buttons/yellow.png" position="280,0" zPosition="0" size="140,40" transparent="1" alphatest="on" />
