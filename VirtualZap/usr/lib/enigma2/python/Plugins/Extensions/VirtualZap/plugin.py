@@ -28,38 +28,36 @@
 #  Thanks to @vlamo <vlamodev@gmail.com>
 #
 ##################################################################################
-from Plugins.Plugin import PluginDescriptor
-from Screens.Screen import Screen
-from Components.ActionMap import ActionMap, NumberActionMap
-from Components.Label import Label
-from Components.Pixmap import Pixmap
-from Components.FileList import FileList
-from enigma import eServiceReference,  eTimer, getDesktop, ePixmap
+from time import localtime, time
 from ServiceReference import ServiceReference
+from Components.ActionMap import ActionMap, NumberActionMap
+from Components.config import config, ConfigSubsection, ConfigSelection, ConfigYesNo, ConfigDirectory, getConfigListEntry, configfile, ConfigPosition, ConfigText, ConfigInteger
+from Components.ConfigList import ConfigList, ConfigListScreen
+from Components.Label import Label
+from Components.Pixmap import Pixmap, MultiPixmap
+from Components.FileList import FileList
+from Components.ProgressBar import ProgressBar
 from Components.SystemInfo import SystemInfo
 from Components.ParentalControl import parentalControl
-from enigma import eServiceCenter, getBestPlayableServiceReference
+from Components.Sources.StaticText import StaticText
 from Components.VideoWindow import VideoWindow
-from enigma import ePoint, eEPGCache
-from time import localtime, time
+from Components.ProgressBar import ProgressBar
+from Screens.Screen import Screen
 from Screens.InfoBarGenerics import InfoBarShowHide, NumberZap, InfoBarPiP
 from Screens.InfoBar import InfoBar
-
-from Components.Sources.StaticText import StaticText
 from Screens.MessageBox import MessageBox
 from Screens.Standby import TryQuitMainloop
-
 from Screens.EpgSelection import EPGSelection
 from Screens.EventView import  EventViewEPGSelect
 from Screens.PictureInPicture import PictureInPicture
+from Plugins.Plugin import PluginDescriptor
+from enigma import eServiceReference,  eTimer, getDesktop, ePixmap
+from enigma import eServiceCenter, getBestPlayableServiceReference
+from enigma import ePoint, eEPGCache
+from skin import parseColor, loadSkin
+from Tools.Directories import pathExists, SCOPE_SKIN_IMAGE, SCOPE_CURRENT_SKIN, SCOPE_CURRENT_PLUGIN, resolveFilename, getSize
 
 InfoBarShowHideINIT = None
-
-from Components.config import config, ConfigSubsection, ConfigSelection, ConfigYesNo, ConfigDirectory, getConfigListEntry, configfile, ConfigPosition, ConfigText, ConfigInteger
-from Components.ConfigList import ConfigList, ConfigListScreen
-from Tools.Directories import pathExists, SCOPE_SKIN_IMAGE, SCOPE_CURRENT_SKIN, resolveFilename, getSize
-
-
 
 # for localized messages
 from . import _
@@ -288,6 +286,9 @@ class VirtualZap(Screen):
 		self["NowTime"] = Label()
 		self["NextTime"] = Label()
 		self["vzPicon"] = Pixmap()
+		self["vzProgress"] = ProgressBar()
+#		self.progressPixmap = None
+#		self["vzProgressImage"] = MultiPixmap()
 		self["actions"] = ActionMap(["OkCancelActions", "DirectionActions", "ChannelSelectBaseActions", "ChannelSelectEPGActions", "ColorActions"], 
 		{
 			"ok": self.ok, 
@@ -447,12 +448,14 @@ class VirtualZap(Screen):
 #		print "Channel number:", num
 		self["NowChannel"].setText(current.getServiceName())
 		self["NowNum"].setText(num)
-		nowepg, nowtimedisplay = self.getEPGNowNext(current.ref,0)
-		nextepg, nexttimedisplay = self.getEPGNowNext(current.ref,1)
+		nowepg, nowtimedisplay, percentnow = self.getEPGNowNext(current.ref,0)
+		nextepg, nexttimedisplay, percentnext = self.getEPGNowNext(current.ref,1)
 		self["NowEPG"].setText(nowepg)
 		self["NextEPG"].setText(nextepg)
 		self["NowTime"].setText(nowtimedisplay)
 		self["NextTime"].setText(nexttimedisplay)
+		self["vzProgress"].setValue(percentnow)
+
 		if config.plugins.virtualzap.picons.value:
 			pngname = self.defpicon
 			service = self.servicelist.getCurrentSelection()
@@ -476,6 +479,12 @@ class VirtualZap(Screen):
 			# play in videowindow
 			self.playService(current.ref)
 
+	def getProgressbar(self, configElement = None):
+		self["vzProgress"].show()
+		value = self["vzProgress"].getValue()
+		self["vzProgress"].setValue(0)
+		self["vzProgress"].setValue(value)
+		
 	def getEPGNowNext(self,ref, modus):
 		# get now || next event
 		if self.epgcache is not None:
@@ -484,15 +493,19 @@ class VirtualZap(Screen):
 				if event[0][4]:
 					t = localtime(event[0][1])
 					duration = event[0][2]
+					begin = event[0][1]
+					now = int(time())
 					if modus == 0:
 						timedisplay =_("+%d min") % (((event[0][1] + duration) - time()) / 60)
+						percent = int((now - begin) * 100 / duration)
 					elif modus == 1:
 						timedisplay =_("%d min") %  (duration / 60)
-					return "%02d:%02d   %s" % (t[3],t[4], event[0][4]), timedisplay
+						percent = 0
+					return "%02d:%02d   %s" % (t[3],t[4], event[0][4]), timedisplay, percent
 				else:
-					return "", ""
-		return "", ""
-
+					return "", "", ""
+		return "", "", ""
+		
 	def openSingleServiceEPG(self):
 		# show EPGList
 		current = ServiceReference(self.servicelist.getCurrentSelection())
