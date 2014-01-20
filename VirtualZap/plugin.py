@@ -41,7 +41,6 @@ from Components.SystemInfo import SystemInfo
 from Components.ParentalControl import parentalControl
 from Components.Sources.StaticText import StaticText
 from Components.VideoWindow import VideoWindow
-from Components.ProgressBar import ProgressBar
 from Screens.Screen import Screen
 from Screens.InfoBarGenerics import InfoBarShowHide, NumberZap, InfoBarPiP
 from Screens.InfoBar import InfoBar
@@ -178,6 +177,8 @@ class VirtualZap(Screen):
 					<widget name="vzPicon" position="100,107" size="100,60" alphatest="blend" zPosition="3"/>
 					<widget backgroundColor="#101214" font="Regular;26" halign="center" name="NowNum" position="260,60" size="60,32" transparent="1" zPosition="2"/>
 					<widget backgroundColor="#101214" font="Regular;26" halign="center" name="NowChannel" position="320,60" size="636,32" transparent="1" zPosition="2"/>
+					<widget foregroundColor="#ffffff" name="vzProgress" position="97,602" size="696,3" transparent="1" zPosition="5"/>
+					<eLabel backgroundColor="#f4f4f4" position="260,603" size="98,1" zPosition="4"/>
 					<widget backgroundColor="#101214" font="Regular;24" foregroundColor="#fcc000" halign="left" name="NowEPG" position="260,105" size="560,28" transparent="1" zPosition="2"/>
 					<widget backgroundColor="#101214" font="Regular;24" halign="left" name="NextEPG" position="260,140" size="560,28" transparent="1" zPosition="2"/>
 					<widget backgroundColor="#101214" font="Regular;24" foregroundColor="#fcc000" halign="right" name="NowTime" position="832,105" size="124,28" transparent="1" zPosition="2"/>
@@ -229,6 +230,8 @@ class VirtualZap(Screen):
 					<ePixmap alphatest="off" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/VirtualZap/hd.png" position="0,505" size="1280,220" zPosition="0"/>
 					<widget backgroundColor="#101214" font="Regular;26" halign="center" name="NowNum" position="260,565" size="60,32" transparent="1" zPosition="2"/>
 					<widget backgroundColor="#101214" font="Regular;26" halign="center" name="NowChannel" position="320,565" size="820,32" transparent="1" zPosition="2"/>
+					<widget foregroundColor="#ffffff" name="vzProgress" position="260,602" size="880,3" transparent="1" zPosition="5"/>
+					<eLabel backgroundColor="#f4f4f4" position="260,603" size="880,1" zPosition="4"/>
 					<widget backgroundColor="#101214" font="Regular;24" foregroundColor="#fcc000" halign="left" name="NowEPG" position="260,610" size="740,28" transparent="1" zPosition="2"/>
 					<widget backgroundColor="#101214" font="Regular;24" halign="left" name="NextEPG" position="260,645" size="740,28" transparent="1" zPosition="2"/>
 					<widget backgroundColor="#101214" font="Regular;24" foregroundColor="#fcc000" halign="right" name="NowTime" position="1015,610" size="124,28" transparent="1" zPosition="2"/>
@@ -287,8 +290,6 @@ class VirtualZap(Screen):
 		self["NextTime"] = Label()
 		self["vzPicon"] = Pixmap()
 		self["vzProgress"] = ProgressBar()
-#		self.progressPixmap = None
-#		self["vzProgressImage"] = MultiPixmap()
 		self["actions"] = ActionMap(["OkCancelActions", "DirectionActions", "ChannelSelectBaseActions", "ChannelSelectEPGActions", "ColorActions"], 
 		{
 			"ok": self.ok, 
