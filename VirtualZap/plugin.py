@@ -1025,26 +1025,48 @@ class VirtualZapConfig(Screen, ConfigListScreen):
 
 	def __init__(self, session):
 		Screen.__init__(self, session)
+		self.onChangedEntry = [ ]
 		self["key_red"] = StaticText(_("Cancel"))
 		self["key_green"] = StaticText(_("OK"))
 		self.setTitle(_("Virtual Zap Config"))
 		self.list = [ ]
-		self.list.append(getConfigListEntry(_("Usage"), config.plugins.virtualzap.mode))
-		self.list.append(getConfigListEntry(_("Show picons"), config.plugins.virtualzap.picons))
-		self.list.append(getConfigListEntry(_("Picon path"), config.plugins.virtualzap.picondir))
-		if SystemInfo.get("NumVideoDecoders", 1) > 1:
-			self.list.append(getConfigListEntry(_("Use PiP"), config.plugins.virtualzap.usepip))
-			self.list.append(getConfigListEntry(_("Show PiP in Infobar"), config.plugins.virtualzap.showpipininfobar))
-			self.list.append(getConfigListEntry(_("Start standard PiP after x secs (0 = disabled)"), config.plugins.virtualzap.exittimer))
-		self.list.append(getConfigListEntry(_("Remember last service"), config.plugins.virtualzap.saveLastService))
-		ConfigListScreen.__init__(self, self.list, session)
+		ConfigListScreen.__init__(self, self.list, session, on_change = self.changedEntry)
+		self.createSetup()
+		
 		self["setupActions"] = ActionMap(["SetupActions", "ColorActions"],
 		{
 			"green": self.keySave,
 			"cancel": self.keyClose,
 			"ok": self.keyOk,
 		}, -2)
+		
+	def createSetup(self):
+		self.list = [ ]
+		self.list.append(getConfigListEntry(_("Usage"), config.plugins.virtualzap.mode))
+		self.list.append(getConfigListEntry(_("Show picons"), config.plugins.virtualzap.picons))
+		if config.plugins.virtualzap.picons.value:
+			self.list.append(getConfigListEntry(_("Picon path"), config.plugins.virtualzap.picondir))
+		if SystemInfo.get("NumVideoDecoders", 1) > 1:
+			self.list.append(getConfigListEntry(_("Use PiP"), config.plugins.virtualzap.usepip))
+			self.list.append(getConfigListEntry(_("Show PiP in Infobar"), config.plugins.virtualzap.showpipininfobar))
+			self.list.append(getConfigListEntry(_("Start standard PiP after x secs (0 = disabled)"), config.plugins.virtualzap.exittimer))
+		self.list.append(getConfigListEntry(_("Remember last service"), config.plugins.virtualzap.saveLastService))
 
+		self["config"].list = self.list
+		self["config"].l.setList(self.list)
+
+	def changedEntry(self):
+		for x in self.onChangedEntry:
+			x()
+			
+	def keyLeft(self):	
+		ConfigListScreen.keyLeft(self)
+		self.createSetup()
+
+	def keyRight(self):
+		ConfigListScreen.keyRight(self)
+		self.createSetup()
+		
 	def keyOk(self):
 		ConfigListScreen.keyOK(self)
 		sel = self["config"].getCurrent()[1]
