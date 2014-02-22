@@ -93,3 +93,12 @@ msgstr ""
 #: plugin.py:847
 msgid "Restart GUI now?"
 msgstr ""
+
+msgid "with Left & Right buttons"
+msgstr ""
+
+msgid "with Up & Down buttons"
+msgstr ""
+
+msgid "No EPG data"
+msgstr ""
