@@ -2,9 +2,13 @@
 	<map context="myShowHideActions">
 		<key id="KEY_OK" mapto="toggleShow" flags="b" />
 		<key id="KEY_ENTER" mapto="toggleShow" flags="b" />
-		<key id="KEY_RED" mapto="longOK" flags="b" />
-		<key id="KEY_GREEN" mapto="longOK" flags="b" />
+		<key id="KEY_OK" mapto="longOK" flags="l" />
+		<key id="KEY_ENTER" mapto="longOK" flags="l" />
 		<key id="KEY_EXIT" mapto="hide" flags="m" />
 		<key id="KEY_ESC" mapto="hide" flags="m" />
+		<key id="KEY_LEFT" mapto="showleft" flags="m" />
+		<key id="KEY_RIGHT" mapto="showright" flags="m" />
+		<key id="KEY_UP" mapto="showup" flags="m" />
+		<key id="KEY_DOWN" mapto="showdown" flags="m" />
 	</map>
 </keymap>
