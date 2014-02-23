@@ -228,9 +228,9 @@ class VirtualZap(Screen):
 					<widget foregroundColor="#ffffff" name="vzProgress" position="97,602" size="696,3" transparent="1" zPosition="5"/>
 					<eLabel backgroundColor="#f4f4f4" position="98,603" size="696,1" zPosition="4"/>
 					<widget backgroundColor="#101214" font="Regular;24" foregroundColor="#fcc000" halign="left" name="NowEventStart" position="260,105" size="80,28" transparent="1" zPosition="2"/>
-					<widget backgroundColor="#101214" font="Regular;24" foregroundColor="#fcc000" halign="left" name="NowEventTitle" position="355,105" size="465,28" transparent="1" zPosition="2"/>
+					<widget backgroundColor="#101214" font="Regular;24" foregroundColor="#fcc000" halign="left" name="NowEventTitle" position="355,105" size="465,28" noWrap="1" transparent="1" zPosition="2"/>
 					<widget backgroundColor="#101214" font="Regular;24" halign="left" name="NextEventStart" position="260,140" size="80,28" transparent="1" zPosition="2"/>
-					<widget backgroundColor="#101214" font="Regular;24" halign="left" name="NextEventTitle" position="355,140" size="465,28" transparent="1" zPosition="2"/>
+					<widget backgroundColor="#101214" font="Regular;24" halign="left" name="NextEventTitle" position="355,140" size="465,28" noWrap="1" transparent="1" zPosition="2"/>
 					<widget backgroundColor="#101214" font="Regular;24" foregroundColor="#fcc000" halign="right" name="NowDuration" position="832,105" size="120,28" transparent="1" zPosition="2"/>
 					<widget backgroundColor="#101214" font="Regular;24" halign="right" name="NextDuration" position="832,140" size="120,28" transparent="1" zPosition="2"/>
 				</screen>"""
@@ -269,9 +269,9 @@ class VirtualZap(Screen):
 					<widget foregroundColor="#ffffff" name="vzProgress" position="305,602" size="885,3" transparent="1" zPosition="5"/>
 					<eLabel backgroundColor="#f4f4f4" position="305,603" size="885,1" zPosition="4"/>
 					<widget backgroundColor="#101214" font="Regular;24" foregroundColor="#fcc000" halign="left" name="NowEventStart" position="305,105" size="80,28" transparent="1" zPosition="2"/>
-					<widget backgroundColor="#101214" font="Regular;24" foregroundColor="#fcc000" halign="left" name="NowEventTitle" position="390,105" size="670,28" transparent="1" zPosition="2"/>
+					<widget backgroundColor="#101214" font="Regular;24" foregroundColor="#fcc000" halign="left" name="NowEventTitle" position="390,105" size="670,28" noWrap="1" transparent="1" zPosition="2"/>
 					<widget backgroundColor="#101214" font="Regular;24" halign="left" name="NextEventStart" position="305,140" size="80,28" transparent="1" zPosition="2"/>
-					<widget backgroundColor="#101214" font="Regular;24" halign="left" name="NextEventTitle" position="390,140" size="670,28" transparent="1" zPosition="2"/>
+					<widget backgroundColor="#101214" font="Regular;24" halign="left" name="NextEventTitle" position="390,140" size="670,28" noWrap="1" transparent="1" zPosition="2"/>
 					<widget backgroundColor="#101214" font="Regular;24" foregroundColor="#fcc000" halign="right" name="NowDuration" position="1070,105" size="120,28" transparent="1" zPosition="2"/>
 					<widget backgroundColor="#101214" font="Regular;24" halign="right" name="NextDuration" position="1070,140" size="120,28" transparent="1" zPosition="2"/>
 				</screen>"""
@@ -324,9 +324,9 @@ class VirtualZap(Screen):
 						<widget foregroundColor="#ffffff" name="vzProgress" position="260,602" size="880,3" transparent="1" zPosition="5"/>
 						<eLabel backgroundColor="#f4f4f4" position="260,603" size="880,1" zPosition="4"/>
 						<widget backgroundColor="#101214" font="Regular;24" foregroundColor="#fcc000" halign="left" name="NowEventStart" position="260,610" size="80,28" transparent="1" zPosition="2"/>
-						<widget backgroundColor="#101214" font="Regular;24" foregroundColor="#fcc000" halign="left" name="NowEventTitle" position="355,610" size="645,28" transparent="1" zPosition="2"/>
+						<widget backgroundColor="#101214" font="Regular;24" foregroundColor="#fcc000" halign="left" name="NowEventTitle" position="355,610" size="645,28" noWrap="1" transparent="1" zPosition="2"/>
 						<widget backgroundColor="#101214" font="Regular;24" halign="left" name="NextEventStart" position="260,645" size="80,28" transparent="1" zPosition="2"/>
-						<widget backgroundColor="#101214" font="Regular;24" halign="left" name="NextEventTitle" position="355,645" size="645,28" transparent="1" zPosition="2"/>
+						<widget backgroundColor="#101214" font="Regular;24" halign="left" name="NextEventTitle" position="355,645" size="645,28" noWrap="1" transparent="1" zPosition="2"/>
 						<widget backgroundColor="#101214" font="Regular;24" foregroundColor="#fcc000" halign="right" name="NowDuration" position="1015,610" size="124,28" transparent="1" zPosition="2"/>
 						<widget backgroundColor="#101214" font="Regular;24" halign="right" name="NextDuration" position="1015,645" size="124,28" transparent="1" zPosition="2"/>
 					</screen>""" % (x,y,w,h)
@@ -361,13 +361,13 @@ class VirtualZap(Screen):
 						<widget backgroundColor="transparent" name="video" position="%d,%d" size="%d,%d" zPosition="1"/>
 						<ePixmap alphatest="off" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/VirtualZap/hd.png" position="0,505" size="1280,220" zPosition="0"/>
 						<widget backgroundColor="#101214" font="Regular;26" halign="center" name="NowNum" position="140,565" size="60,32" transparent="1" zPosition="2"/>
-						<widget backgroundColor="#101214" font="Regular;26" halign="center" name="NowChannel" position="245,645" size="820,32" transparent="1" zPosition="2"/>
+						<widget backgroundColor="#101214" font="Regular;26" halign="center" name="NowChannel" position="245,565" size="820,32" transparent="1" zPosition="2"/>
 						<widget foregroundColor="#ffffff" name="vzProgress" position="140,602" size="1000,3" transparent="1" zPosition="5"/>
 						<eLabel backgroundColor="#f4f4f4" position="140,603" size="1000,1" zPosition="4"/>
 						<widget backgroundColor="#101214" font="Regular;24" foregroundColor="#fcc000" halign="left" name="NowEventStart" position="140,610" size="80,28" transparent="1" zPosition="2"/>
-						<widget backgroundColor="#101214" font="Regular;24" foregroundColor="#fcc000" halign="left" name="NowEventTitle" position="225,610" size="765,28" transparent="1" zPosition="2"/>
+						<widget backgroundColor="#101214" font="Regular;24" foregroundColor="#fcc000" halign="left" name="NowEventTitle" position="225,610" size="765,28" noWrap="1" transparent="1" zPosition="2"/>
 						<widget backgroundColor="#101214" font="Regular;24" halign="left" name="NextEventStart" position="140,645" size="80,28" transparent="1" zPosition="2"/>
-						<widget backgroundColor="#101214" font="Regular;24" halign="left" name="NextEventTitle" position="225,645" size="765,28" transparent="1" zPosition="2"/>
+						<widget backgroundColor="#101214" font="Regular;24" halign="left" name="NextEventTitle" position="225,645" size="765,28" noWrap="1" transparent="1" zPosition="2"/>
 						<widget backgroundColor="#101214" font="Regular;24" foregroundColor="#fcc000" halign="right" name="NowDuration" position="1015,610" size="124,28" transparent="1" zPosition="2"/>
 						<widget backgroundColor="#101214" font="Regular;24" halign="right" name="NextDuration" position="1015,645" size="124,28" transparent="1" zPosition="2"/>
 					</screen>""" % (x,y,w,h)
