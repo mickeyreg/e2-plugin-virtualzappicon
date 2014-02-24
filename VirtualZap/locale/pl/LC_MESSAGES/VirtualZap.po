@@ -21,8 +21,8 @@ msgid "with long OK press"
 msgstr "przez długie naciśnięcie OK"
 
 #: plugin.py:67
-msgid "with exit button"
-msgstr "przez naciśnięcie EXIT"
+msgid "with Exit button"
+msgstr "przez naciśnięcie Exit"
 
 #: plugin.py:135
 msgid "Could not open Picture in Picture"

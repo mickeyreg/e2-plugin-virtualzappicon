@@ -20,7 +20,7 @@ msgid "with long OK press"
 msgstr ""
 
 #: plugin.py:67
-msgid "with exit button"
+msgid "with Exit button"
 msgstr ""
 
 #: plugin.py:135
