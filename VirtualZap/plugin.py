@@ -41,6 +41,7 @@ from Components.SystemInfo import SystemInfo
 from Components.ParentalControl import parentalControl
 from Components.Sources.StaticText import StaticText
 from Components.VideoWindow import VideoWindow
+from Components.Renderer.Picon import getPiconName
 from Screens.Screen import Screen
 from Screens.InfoBarGenerics import InfoBarShowHide, NumberZap, InfoBarPiP, InfoBarPlugins
 from Screens.InfoBar import InfoBar
@@ -617,13 +618,10 @@ class VirtualZap(Screen):
 			service = self.servicelist.getCurrentSelection()
 			if service:
 				sname = service.toString()
-				sname = ':'.join(sname.split(':')[:11])
-				pos = sname.rfind(':')
-				if pos != -1:
-					sname = sname[:pos].rstrip(':').replace(':','_')
-					sname = config.plugins.virtualzap.picondir.value + sname + '.png'
-					if pathExists(sname):
-						pngname = sname
+				pngname = getPiconName(sname)
+				pathpngname = config.plugins.virtualzap.picondir.value + pngname + '.png'
+				if pathExists(pathpngname):
+					pngname = pathpngname
 			self["vzPicon"].instance.setPixmapFromFile(pngname)
 
 		if not nowepg:
