@@ -24,9 +24,6 @@
 #  Modified by herpoi (herpoi2006@gmail.com)
 #  https://github.com/herpoi
 #
-#  Picon finder and DirectoryBrowser from Extended NumberZap Plugin
-#  Thanks to @vlamo <vlamodev@gmail.com>
-#
 ##################################################################################
 from time import localtime, time, strftime
 from ServiceReference import ServiceReference
@@ -74,7 +71,6 @@ config.plugins.virtualzap.usepip = ConfigYesNo(default = True)
 config.plugins.virtualzap.showpipininfobar = ConfigYesNo(default = True)
 config.plugins.virtualzap.saveLastService = ConfigYesNo(default = False)
 config.plugins.virtualzap.picons = ConfigYesNo(default = True)
-config.plugins.virtualzap.picondir = ConfigDirectory()
 config.plugins.virtualzap.curref = ConfigText()
 config.plugins.virtualzap.curbouquet = ConfigText()
 config.plugins.virtualzap.exittimer =  ConfigInteger(0,limits = (0, 20))
@@ -617,11 +613,8 @@ class VirtualZap(Screen):
 			pngname = self.defpicon
 			service = self.servicelist.getCurrentSelection()
 			if service:
-				sname = service.toString()
-				pngname = getPiconName(sname)
-				pathpngname = config.plugins.virtualzap.picondir.value + pngname + '.png'
-				if pathExists(pathpngname):
-					pngname = pathpngname
+				pngname = getPiconName(service.toString())
+#				print "[VirtualZap]pngname:" + pngname
 			self["vzPicon"].instance.setPixmapFromFile(pngname)
 
 		if not nowepg:
@@ -944,70 +937,6 @@ class VirtualZap(Screen):
 				"keyTV": self.servicelist.setModeTv,
 			})
 			
-class DirectoryBrowserVZ(Screen):
-	skin = """<screen name="DirectoryBrowserVZ" position="center,center" size="520,440" title=" " >
-			<ePixmap pixmap="skin_default/buttons/red.png" position="0,0" size="140,40" alphatest="on" />
-			<ePixmap pixmap="skin_default/buttons/green.png" position="140,0" size="140,40" alphatest="on" />
-			<widget source="key_red" render="Label" position="0,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" transparent="1" />
-			<widget source="key_green" render="Label" position="140,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
-			<widget source="curdir" render="Label" position="5,50" size="510,20"  font="Regular;20" halign="left" valign="center" backgroundColor="background" transparent="1" noWrap="1" />
-			<widget name="filelist" position="5,80" size="510,345" scrollbarMode="showOnDemand" />
-		</screen>"""
-	
-	def __init__(self, session, curdir, matchingPattern=None):
-		Screen.__init__(self, session)
-
-		self["Title"].setText(_("Directory browser"))
-		self["key_red"] = StaticText(_("Cancel"))
-		self["key_green"] = StaticText(_("Save"))
-		self["curdir"] = StaticText(_("current:  %s")%(curdir or ''))
-
-		self.filelist = FileList(curdir, matchingPattern=matchingPattern, enableWrapAround=True)
-		self.filelist.onSelectionChanged.append(self.__selChanged)
-		self["filelist"] = self.filelist
-
-		self["FilelistActions"] = ActionMap(["SetupActions", "ColorActions"],
-			{
-				"green": self.keyGreen,
-				"red": self.keyRed,
-				"ok": self.keyOk,
-				"cancel": self.keyRed
-			})
-		self.onLayoutFinish.append(self.__layoutFinished)
-
-	def __layoutFinished(self):
-		#self.setTitle(_("Directory browser"))
-		pass
-
-	def getCurrentSelected(self):
-		dirname = self.filelist.getCurrentDirectory()
-		filename = self.filelist.getFilename()
-		if not filename and not dirname:
-			cur = ''
-		elif not filename:
-			cur = dirname
-		elif not dirname:
-			cur = filename
-		else:
-			if not self.filelist.canDescent() or len(filename) <= len(dirname):
-				cur = dirname
-			else:
-				cur = filename
-		return cur or ''
-
-	def __selChanged(self):
-		self["curdir"].setText(_("current:  %s")%(self.getCurrentSelected()))
-
-	def keyOk(self):
-		if self.filelist.canDescent():
-			self.filelist.descent()
-
-	def keyGreen(self):
-		self.close(self.getCurrentSelected())
-
-	def keyRed(self):
-		self.close(False)
-
 class VirtualZapConfig(Screen, ConfigListScreen):
 
 	skin = """
@@ -1042,8 +971,6 @@ class VirtualZapConfig(Screen, ConfigListScreen):
 		self.list = [ ]
 		self.list.append(getConfigListEntry(_("Usage"), config.plugins.virtualzap.mode))
 		self.list.append(getConfigListEntry(_("Show picons"), config.plugins.virtualzap.picons))
-		if config.plugins.virtualzap.picons.value:
-			self.list.append(getConfigListEntry(_("Picon path"), config.plugins.virtualzap.picondir))
 		if SystemInfo.get("NumVideoDecoders", 1) > 1:
 			self.list.append(getConfigListEntry(_("Use PiP"), config.plugins.virtualzap.usepip))
 			self.list.append(getConfigListEntry(_("Show PiP in Infobar"), config.plugins.virtualzap.showpipininfobar))
@@ -1068,14 +995,8 @@ class VirtualZapConfig(Screen, ConfigListScreen):
 	def keyOk(self):
 		ConfigListScreen.keyOK(self)
 		sel = self["config"].getCurrent()[1]
-		if sel == config.plugins.virtualzap.picondir:
-			self.session.openWithCallback(self.directoryBrowserClosed, DirectoryBrowserVZ, config.plugins.virtualzap.picondir.value, "^.*\.png")
 #			self.close()
 			
-	def directoryBrowserClosed(self, path):
-		if path != False:
-			config.plugins.virtualzap.picondir.setValue(path)
-
 	def keySave(self):
 		for x in self["config"].list:
 			x[1].save()
