@@ -212,7 +212,7 @@ class VirtualZap(Screen):
 	# VirtualZapPicon or VirtualZapPiconNoPiP
 	#
 
-	if SystemInfo.get("NumVideoDecoders", 1) > 1 and config.plugins.virtualzap.usepip.value and config.plugins.virtualzap.showpipininfobar.value and config.plugins.virtualzap.picons.value:
+	if SystemInfo["PIPAvailable"] and config.plugins.virtualzap.usepip.value and config.plugins.virtualzap.showpipininfobar.value and config.plugins.virtualzap.picons.value:
 		# use PiP in InfobarPicon
 		if sz_w == 1280:
 			skin = """
@@ -254,7 +254,7 @@ class VirtualZap(Screen):
 					<widget backgroundColor="#101214" font="Regular;20" halign="right" name="NextDuration" position="550,80" size="120,25" transparent="1" zPosition="2"/>
 				</screen>"""
 				
-	elif SystemInfo.get("NumVideoDecoders", 1) > 1 and config.plugins.virtualzap.usepip.value and config.plugins.virtualzap.showpipininfobar.value and not config.plugins.virtualzap.picons.value:
+	elif SystemInfo["PIPAvailable"] and config.plugins.virtualzap.usepip.value and config.plugins.virtualzap.showpipininfobar.value and not config.plugins.virtualzap.picons.value:
 		# use PiP in Infobar
 		if sz_w == 1280:
 			skin = """
@@ -295,7 +295,7 @@ class VirtualZap(Screen):
 					<widget backgroundColor="#101214" font="Regular;20" halign="right" name="NextDuration" position="550,80" size="120,25" transparent="1" zPosition="2"/>
 				</screen>"""
 	else:
-		if SystemInfo.get("NumVideoDecoders", 1) > 1 and config.plugins.virtualzap.usepip.value and not config.plugins.virtualzap.showpipininfobar.value:
+		if SystemInfo["PIPAvailable"] and config.plugins.virtualzap.usepip.value and not config.plugins.virtualzap.showpipininfobar.value:
 			# use standard PiP
 			config.av.pip = ConfigPosition(default=[0, 0, 0, 0], args = (719, 567, 720, 568))
 			x = config.av.pip.value[0]
@@ -394,19 +394,19 @@ class VirtualZap(Screen):
 	def __init__(self, session, servicelist = None):
 		Screen.__init__(self, session)
 		self.session = session
-		if SystemInfo.get("NumVideoDecoders", 1) > 1 and config.plugins.virtualzap.usepip.value and config.plugins.virtualzap.showpipininfobar.value and config.plugins.virtualzap.picons.value:
+		if SystemInfo["PIPAvailable"] and config.plugins.virtualzap.usepip.value and config.plugins.virtualzap.showpipininfobar.value and config.plugins.virtualzap.picons.value:
 			self.skinName = "VirtualZapPicon"
 			self.pipAvailable = True
-		elif SystemInfo.get("NumVideoDecoders", 1) > 1 and config.plugins.virtualzap.usepip.value and config.plugins.virtualzap.showpipininfobar.value and not config.plugins.virtualzap.picons.value:
+		elif SystemInfo["PIPAvailable"] and config.plugins.virtualzap.usepip.value and config.plugins.virtualzap.showpipininfobar.value and not config.plugins.virtualzap.picons.value:
 			self.skinName = "VirtualZap"
 			self.pipAvailable = True
 		else:
 			if config.plugins.virtualzap.picons.value:
 				self.skinName = "VirtualZapPiconNoPiP"
-				self.pipAvailable =  (SystemInfo.get("NumVideoDecoders", 1) > 1)  and config.plugins.virtualzap.usepip.value and not config.plugins.virtualzap.showpipininfobar.value
+				self.pipAvailable =  (SystemInfo["PIPAvailable"])  and config.plugins.virtualzap.usepip.value and not config.plugins.virtualzap.showpipininfobar.value
 			else:
 				self.skinName = "VirtualZapNoPiP"
-				self.pipAvailable =  (SystemInfo.get("NumVideoDecoders", 1) > 1)  and config.plugins.virtualzap.usepip.value and not config.plugins.virtualzap.showpipininfobar.value
+				self.pipAvailable =  (SystemInfo["PIPAvailable"])  and config.plugins.virtualzap.usepip.value and not config.plugins.virtualzap.showpipininfobar.value
 					
 		self.epgcache = eEPGCache.getInstance()
 		self.CheckForEPG = eTimer()
@@ -615,6 +615,7 @@ class VirtualZap(Screen):
 			if service:
 				pngname = getPiconName(service.toString())
 #				print "[VirtualZap]pngname:" + pngname
+			self["vzPicon"].instance.setScale(1)
 			self["vzPicon"].instance.setPixmapFromFile(pngname)
 
 		if not nowepg:
@@ -971,7 +972,7 @@ class VirtualZapConfig(Screen, ConfigListScreen):
 		self.list = [ ]
 		self.list.append(getConfigListEntry(_("Usage"), config.plugins.virtualzap.mode))
 		self.list.append(getConfigListEntry(_("Show picons"), config.plugins.virtualzap.picons))
-		if SystemInfo.get("NumVideoDecoders", 1) > 1:
+		if SystemInfo["PIPAvailable"]:
 			self.list.append(getConfigListEntry(_("Use PiP"), config.plugins.virtualzap.usepip))
 			self.list.append(getConfigListEntry(_("Show PiP in Infobar"), config.plugins.virtualzap.showpipininfobar))
 			self.list.append(getConfigListEntry(_("Start standard PiP after x secs (0 = disabled)"), config.plugins.virtualzap.exittimer))
