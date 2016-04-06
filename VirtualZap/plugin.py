@@ -57,7 +57,7 @@ from Tools.Directories import pathExists, SCOPE_SKIN_IMAGE, SCOPE_CURRENT_SKIN, 
 InfoBarShowHideINIT = None
 
 # for localized messages
-from . import _
+from __init__ import _
 
 # PiPServiceRelation installed?
 try:
@@ -66,7 +66,16 @@ try:
 except:
 	plugin_PiPServiceRelation_installed = False
 config.plugins.virtualzap = ConfigSubsection()
-config.plugins.virtualzap.mode = ConfigSelection(default="0", choices = [("0", _("as plugin in extended bar")), ("1", _("with long OK press")), ("2", _("with Exit button")), ("3", _("with Left & Right buttons")), ("4", _("with Up & Down buttons"))])
+if config.usage.ok_is_channelselection.value:
+	config.plugins.virtualzap.mode = ConfigSelection(default="0", choices = [("0", _("as plugin in extended bar")), ("1", _("with long OK press")), ("2", _("with Exit button")), ("3", _("with Left & Right buttons")), ("4", _("with Up & Down buttons"))])
+else:	
+	# When OK is not used for channel selectio (OpenPLi setting)
+	# then LONG OK is required for SenconInfobar mode change
+	# and using it for VirtualZap is disabled (switched to default)
+	config.plugins.virtualzap.mode = ConfigSelection(default="0", choices = [("0", _("as plugin in extended bar")), ("2", _("with Exit button")), ("3", _("with Left & Right buttons")), ("4", _("with Up & Down buttons"))])
+	if config.plugins.virtualzap.mode.value == "1":
+		config.plugins.virtualzap.mode.value == "0"
+		config.plugins.virtualzap.mode.value.save()
 config.plugins.virtualzap.usepip = ConfigYesNo(default = True)
 config.plugins.virtualzap.showpipininfobar = ConfigYesNo(default = True)
 config.plugins.virtualzap.saveLastService = ConfigYesNo(default = False)
@@ -86,29 +95,31 @@ if config.plugins.virtualzap.mode.value == "0" or config.plugins.virtualzap.mode
 			# new method
 			InfoBarShowHide.showVZ = showVZ
 			InfoBarShowHide.VirtualZapCallback = VirtualZapCallback
+			if config.plugins.virtualzap.mode.value == "1":
+				InfoBarShowHide.toggleVZShowLong = toggleVZShowLong
 			if config.plugins.virtualzap.mode.value == "2":
-				InfoBarShowHide.newHide = newHide
+				InfoBarShowHide.keyVZHide = keyVZHide
 
 	def InfoBarShowHide__init__(self):
 		# initialize InfoBarShowHide with original __init__
 		InfoBarShowHideINIT(self)
-		# delete current key map --> we have to use "ok" with b-flag
 		if config.plugins.virtualzap.mode.value == "1":
-			del self["ShowHideActions"]
-			# initialize own actionmap with ok = b and longOK = l
-			self["myactions"] = ActionMap( ["myShowHideActions"] ,
-
+			self["ShowHideActions"] = ActionMap( ["InfobarShowHideActions"] ,
 			{
-				"toggleShow": self.toggleShow,
-				"longOK": self.showVZ,
-				"hide": self.hide,
+				"toggleShow": self.okButtonCheck,
+				"toggleShowInfo": self.toggleShow,
+				"hide": self.keyHide,
+				"toggleShowLong" : self.toggleVZShowLong,
+				"hideLong" : self.hideLong,
 			}, 1)
 		elif config.plugins.virtualzap.mode.value == "2":
 			self["ShowHideActions"] = ActionMap( ["InfobarShowHideActions"] ,
-
 			{
-				"toggleShow": self.toggleShow,
-				"hide": self.newHide,
+				"toggleShow": self.okButtonCheck,
+				"toggleShowInfo": self.toggleShow,
+				"hide": self.keyVZHide,
+				"toggleShowLong" : self.toggleShowLong,
+				"hideLong" : self.hideLong,
 			}, 1)
 			
 	def Plugins(**kwargs):
@@ -191,10 +202,18 @@ def VirtualZapCallback(self, service = None, servicePath = None):
 				del self.session.pip
 				self.session.openWithCallback(self.close, MessageBox, _("Could not open Picture in Picture"), MessageBox.TYPE_ERROR)
 
-def newHide(self):
+def toggleVZShowLong(self):
 	# remember if infobar is shown
 	visible = self.shown
-	self.hide()
+	self.toggleShowLong()
+	if not visible:
+		# infobar was not shown, start VZ
+		self.showVZ()
+
+def keyVZHide(self):
+	# remember if infobar is shown
+	visible = self.shown
+	self.keyHide()
 	if not visible:
 		# infobar was not shown, start VZ
 		self.showVZ()
