@@ -25,8 +25,8 @@ msgid "with long OK press"
 msgstr "con pressione lunga tasto Ok"
 
 #: /home/dario/Plugins/virtualzap/src/plugin.py:55
-msgid "with Exit button"
-msgstr "con il tasto exit"
+msgid "with Exit/Back button"
+msgstr "con il tasto exit/back"
 
 #: /home/dario/Plugins/virtualzap/src/plugin.py:121
 msgid "Could not open Picture in Picture"

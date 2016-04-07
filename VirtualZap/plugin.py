@@ -67,12 +67,12 @@ except:
 	plugin_PiPServiceRelation_installed = False
 config.plugins.virtualzap = ConfigSubsection()
 if config.usage.ok_is_channelselection.value:
-	config.plugins.virtualzap.mode = ConfigSelection(default="0", choices = [("0", _("as plugin in extended bar")), ("1", _("with long OK press")), ("2", _("with Exit button")), ("3", _("with Left & Right buttons")), ("4", _("with Up & Down buttons"))])
+	config.plugins.virtualzap.mode = ConfigSelection(default="0", choices = [("0", _("as plugin in extended bar")), ("1", _("with long OK press")), ("2", _("with Exit/Back button")), ("3", _("with Left & Right buttons")), ("4", _("with Up & Down buttons"))])
 else:	
-	# When OK is not used for channel selectio (OpenPLi setting)
+	# When OK is not used for channel selection (OpenPLi setting)
 	# then LONG OK is required for SenconInfobar mode change
-	# and using it for VirtualZap is disabled (switched to default)
-	config.plugins.virtualzap.mode = ConfigSelection(default="0", choices = [("0", _("as plugin in extended bar")), ("2", _("with Exit button")), ("3", _("with Left & Right buttons")), ("4", _("with Up & Down buttons"))])
+	# so using it for Virtual Zap was disabled (switched to default)
+	config.plugins.virtualzap.mode = ConfigSelection(default="0", choices = [("0", _("as plugin in extended bar")), ("2", _("with Exit/Back button")), ("3", _("with Left & Right buttons")), ("4", _("with Up & Down buttons"))])
 	if config.plugins.virtualzap.mode.value == "1":
 		config.plugins.virtualzap.mode.value == "0"
 		config.plugins.virtualzap.mode.value.save()

@@ -21,7 +21,7 @@ msgid "with long OK press"
 msgstr "با فشردن طولانی ماندن اوکی"
 
 #: ../src/plugin.py:48
-msgid "with Exit button"
+msgid "with Exit/Back button"
 msgstr "با استفاده از دکمه خروج"
 
 #: ../src/plugin.py:106

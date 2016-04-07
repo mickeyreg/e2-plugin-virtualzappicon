@@ -14,15 +14,15 @@ msgstr ""
 
 #: plugin.py:67
 msgid "as plugin in extended bar"
-msgstr "jako plugin na liście rozszerzeń"
+msgstr "jako wtyczka na liście rozszerzeń"
 
 #: plugin.py:67
 msgid "with long OK press"
 msgstr "przez długie naciśnięcie OK"
 
 #: plugin.py:67
-msgid "with Exit button"
-msgstr "przez naciśnięcie Exit"
+msgid "with Exit/Back button"
+msgstr "przez naciśnięcie Exit/Back"
 
 #: plugin.py:135
 msgid "Could not open Picture in Picture"
@@ -62,11 +62,11 @@ msgstr "Używaj PiP"
 
 #: plugin.py:818
 msgid "Show PiP in Infobar"
-msgstr "Pokaż PiP na Infobarze"
+msgstr "Pokaż PiP na pasku Info"
 
 #: plugin.py:819
 msgid "Start standard PiP after x secs (0 = disabled)"
-msgstr "Uruchom PiP po ... sekundach"
+msgstr "Uruchom PiP po ... sekundach (0 = wyłącz)"
 
 #: plugin.py:820
 msgid "Show picons"
